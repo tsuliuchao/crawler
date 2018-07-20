@@ -15,5 +15,4 @@ class NewsItem(scrapy.Item):
     url = scrapy.Field()
     jtext = scrapy.Field()
     site = scrapy.Field()
-    print("class NewsItem")
     pass

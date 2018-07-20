@@ -8,6 +8,7 @@
 #     https://doc.scrapy.org/en/latest/topics/settings.html
 #     https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://doc.scrapy.org/en/latest/topics/spider-middleware.html
+import logging
 
 BOT_NAME = 'news'
 
@@ -65,7 +66,7 @@ ROBOTSTXT_OBEY = False
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'news.pipelines.NewsPipeline': 3000000,
+    'news.pipelines.NewsPipeline': 5,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -88,3 +89,16 @@ ITEM_PIPELINES = {
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+LOG_ENCODING = "utf-8"
+LOG_LEVEL = logging.INFO
+LOG_FILE = "log/spider.log"
+#LOG_STDOUT = True
+LOG_FORMAT = "%(asctime)s [%(name)s] %(levelname)s: %(message)s"
+LOG_DATEFORMAT = "%Y-%m-%d %H:%M:%S"
+
+# 新闻库
+MYSQL_SHUSHUO_NEWS = 'mysql+pymysql://shushuo:shushuo@10.101.81.99:8306/shushuo'
+
+# 抓取日期
+NEWS_CONTENT_INTERVAL_DAY = -1
