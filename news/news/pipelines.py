@@ -52,18 +52,12 @@ class NewsPipeline(object):
         """
         去重
         """
-        self.cache_urls = []
+        self.cache_urls = set()
         self.nowtime = datetime.datetime.now();
 
     def open_spider(self, spider):
         """This method is called when the spider is opened."""
         _log.info('open_spider[%s]....' % spider.name)
-        session = self.Session()
-        recent_news = session.query(News.m_url).filter(
-            self.nowtime - News.m_public_time <= datetime.timedelta(days=2)).all()
-        self.cache_urls = [t.m_url for t in recent_news]
-        print(self.cache_urls)
-        _log.info(self.cache_urls)
 
     def process_item(self, item, spider):
         """
@@ -73,7 +67,7 @@ class NewsPipeline(object):
             _log.info('[url exists!]url=%s' % item['url'])
             raise DropItem("Duplicate item found: %s" % item)
         else:
-            self.cache_urls.append(item['url'])
+            self.cache_urls.add(item['url'])
 
         publishDate = str(item['publishTime'])
         """
@@ -92,10 +86,15 @@ class NewsPipeline(object):
                         m_public_time=item['publishTime'],
                         m_from = 1,
                         m_site=item['site'])
+
         with session_scope(self.Session) as session:
-            session.add(news)
-            line = json.dumps(dict(item), ensure_ascii=False) + "\n"
-            self.file.write(line)
+            recent_news = session.query(News.m_url).filter(News.m_url == item['url']).first()
+            if recent_news is None:
+                session.add(news)
+                line = json.dumps(dict(item), ensure_ascii=False) + "\n"
+                self.file.write(line)
+            else:
+                _log.info('news repeat!url=%s' % item['url'])
 
         return item
 
